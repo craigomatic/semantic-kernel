@@ -2,11 +2,14 @@
 
 package com.microsoft.semantickernel.skills.random;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.azure.functions.*;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,7 +29,7 @@ public class RandomActivitySkill {
      * @return A CompletableFuture of HttpResponseMessage containing the random activity.
      */
     @FunctionName("GetRandomActivity")
-    public CompletableFuture<HttpResponseMessage> getRandomActivityAsync(
+    public HttpResponseMessage getRandomActivity(
             @HttpTrigger(name = "request", methods = HttpMethod.GET, route = "getRandomActivity") HttpRequestMessage<String> request,
             ExecutionContext context) {
 
@@ -35,16 +38,17 @@ public class RandomActivitySkill {
                 .uri(URI.create("https://www.boredapi.com/api/activity"))
                 .build();
 
-        return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    try {
-                        Activity activity = objectMapper.readValue(response.body(), Activity.class);
-                        return request.createResponseBuilder(HttpStatus.OK).body(activity.activity()).build();
-                    } catch (Exception e) {
-                        context.getLogger().severe("Error deserializing JSON: " + e.getMessage());
-                        return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deserializing JSON").build();
-                    }
-                });
+        try {
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            ObjectMapper objectMapper = new ObjectMapper();
+            Activity activity = objectMapper.readValue(response.body(), Activity.class);
+            return request.createResponseBuilder(HttpStatus.OK).body(activity.activity()).build();
+        } catch (IOException | InterruptedException e) {
+            context.getLogger().severe("Error deserializing JSON: " + e.getMessage());
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deserializing JSON").build();
+        } catch (Exception e) {
+            context.getLogger().severe("Error with request: " + e.getMessage());
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage()).build();
+        }
     }
 }
