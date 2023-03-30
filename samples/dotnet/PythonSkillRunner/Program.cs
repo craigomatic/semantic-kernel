@@ -4,14 +4,15 @@ using DotnetReferenceSkill;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.KernelExtensions;
 using Microsoft.SemanticKernel.Orchestration;
+using Python.Runtime;
 
 const string RANDOM_ACTIVITY_PROMPT = "Find me an activity to do, return only a single activity. I like to {{$INPUT}}. Be creative!";
 const string DEGREES_OF_SEPARATION_PROMPT = "How many degrees of separation are there between {{$ITEM1}} and {{$ITEM2}}? Bonus points for Kevin Bacon reference.";
 
 //configure your Azure OpenAI backend
-var key = "";
-var endpoint = "";
-var model = "";
+var key = "5b742c40-bc2b-4a4f-902f-ee9f644d8844";
+var endpoint = "https://piloteers-temporary-openai-westus.openai.azure.com/";
+var model = "dv3";
 
 
 var sk = Kernel.Builder.Configure(c => c.AddAzureOpenAICompletionBackend(model, model, endpoint, key)).Build();
@@ -40,7 +41,7 @@ sk.CreateSemanticFunction(DEGREES_OF_SEPARATION_PROMPT,
 var randomActivitySkill = new RandomActivitySkill();
 sk.ImportSkill(randomActivitySkill, nameof(RandomActivitySkill));
 
-var thingiliketodo = "surf";
+var thingiliketodo = "read";
 var llmResult = string.Empty;
 var apiResult = string.Empty;
 
@@ -48,6 +49,30 @@ var apiResult = string.Empty;
 var llmRandomActivityResult = await sk.RunAsync(thingiliketodo, sk.Skills.GetSemanticFunction("RandomActivityLLMSkill", "GetRandomActivity"));
 llmResult = llmRandomActivityResult.Result;
 Console.WriteLine("LLM suggested: " + llmResult);
+PythonEngine.Initialize();
+using (Py.GIL())
+{
+    dynamic requests = Py.Import("requests");
+    dynamic json = Py.Import("json");
+    var result = requests.get("https://www.boredapi.com/api/activity");
+    Console.WriteLine(result.text);
+    // Or
+    String getActivity = "result = requests.get('https://www.boredapi.com/api/activity')";
+    using (PyModule scope = Py.CreateScope())
+    {
+        String parseActivity = @"import json;
+import requests;
+result = requests.get('https://www.boredapi.com/api/activity').text;
+activityObject = json.loads(result);
+print('Activity in python: ' + activityObject['activity'])";
+        scope.Exec(parseActivity);
+        var activityObject = scope.Get<object>("activityObject");
+        Console.WriteLine("Activity in C#: " + activityObject.ToString());
+    }
+
+}
+
+
 
 //ask the skill to find us a random activity via API
 var skillApiRandomActivityResult = await sk.RunAsync(sk.Skills.GetNativeFunction(nameof(RandomActivitySkill), "GetRandomActivity"));
