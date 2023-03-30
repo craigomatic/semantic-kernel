@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
-
-using DotnetReferenceSkill;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.KernelExtensions;
 using Microsoft.SemanticKernel.Orchestration;
+using Python.Runtime;
+using PythonSkillRunner;
 
 const string RANDOM_ACTIVITY_PROMPT = "Find me an activity to do, return only a single activity. I like to {{$INPUT}}. Be creative!";
 const string DEGREES_OF_SEPARATION_PROMPT = "How many degrees of separation are there between {{$ITEM1}} and {{$ITEM2}}? Bonus points for Kevin Bacon reference.";
@@ -12,7 +12,6 @@ const string DEGREES_OF_SEPARATION_PROMPT = "How many degrees of separation are 
 var key = "";
 var endpoint = "";
 var model = "";
-
 
 var sk = Kernel.Builder.Configure(c => c.AddAzureOpenAICompletionBackend(model, model, endpoint, key)).Build();
 
@@ -33,16 +32,13 @@ sk.CreateSemanticFunction(DEGREES_OF_SEPARATION_PROMPT,
             temperature: 0.2,
             topP: 0.5);
 #endregion
-
-//TODO: load your python skill here
-//currently loading a skill that will pull a random activity from an API.
-//We will compare the activity to the one from the LLM and return true if they match, false if not
-var randomActivitySkill = new RandomActivitySkill();
-sk.ImportSkill(randomActivitySkill, nameof(RandomActivitySkill));
-
-var thingiliketodo = "surf";
+var thingiliketodo = "read";
 var llmResult = string.Empty;
 var apiResult = string.Empty;
+
+//We will compare the activity to the one from the LLM and return true if they match, false if not
+var randomActivitySkill = new PythonRandomActivitySkill();
+sk.ImportSkill(randomActivitySkill, nameof(PythonRandomActivitySkill));
 
 //ask the LLM for a random activity
 var llmRandomActivityResult = await sk.RunAsync(thingiliketodo, sk.Skills.GetSemanticFunction("RandomActivityLLMSkill", "GetRandomActivity"));
@@ -50,7 +46,7 @@ llmResult = llmRandomActivityResult.Result;
 Console.WriteLine("LLM suggested: " + llmResult);
 
 //ask the skill to find us a random activity via API
-var skillApiRandomActivityResult = await sk.RunAsync(sk.Skills.GetNativeFunction(nameof(RandomActivitySkill), "GetRandomActivity"));
+var skillApiRandomActivityResult = await sk.RunAsync(sk.Skills.GetNativeFunction(nameof(PythonRandomActivitySkill), "GetRandomActivity"));
 apiResult = skillApiRandomActivityResult.Result;
 Console.WriteLine("Skill suggested: " + apiResult);
 
