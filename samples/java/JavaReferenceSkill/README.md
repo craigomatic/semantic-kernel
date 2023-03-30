@@ -2,6 +2,20 @@
 
 Due to several customer requests, we want to have examples of polyglot Skills, starting with the most popular languages that customers demand. This PR implements [Java Skill Runner](https://github.com/craigomatic/semantic-kernel/blob/arbitrary-language-skills/samples/dotnet/JavaSkillRunner/Program.cs#L37), maintaining parity with [DotnetReferenceSkill](https://github.com/craigomatic/semantic-kernel/blob/arbitrary-language-skills/samples/dotnet/DotnetReferenceSkill/RandomActivitySkill.cs#L13). The Java code is invoked from C# code using `ikvm`, showcasing the interoperability between Java and C# within a single project.
 
+#### Prerequisites
+- [Java 17](https://microsoft.com/openjdk)
+- [Azure Functions Core Tools v4](https://github.com/Azure/azure-functions-core-tools#installing)
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+#### Local Run
+```bash
+./gradlew clean azureFunctionsRun
+```
+
+#### Deploy to Azure
+```bash
+./gradlew clean azureFunctionsDeploy
+```
 
 ### Description
 Goal: [Java Skill Runner](https://github.com/craigomatic/semantic-kernel/blob/arbitrary-language-skills/samples/dotnet/JavaSkillRunner/Program.cs#L37) , running in Common Language Runtime (CLR), has to invoke a Java method (`getrandomactivity`) in `RandomActivitySkill`, running in Java Virtual Machine (JVM). `getrandomactivity` method does a simple REST call to fetch a random activity from [boredapi](https://www.boredapi.com/api/activity).
