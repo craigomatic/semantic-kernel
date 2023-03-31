@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
-
-using System.Reflection;
-using DotnetReferenceSkill;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.KernelExtensions;
 using Microsoft.SemanticKernel.Orchestration;
 using Python.Runtime;
+using PythonSkillRunner;
 
 const string RANDOM_ACTIVITY_PROMPT = "Find me an activity to do, return only a single activity. I like to {{$INPUT}}. Be creative!";
 const string DEGREES_OF_SEPARATION_PROMPT = "How many degrees of separation are there between {{$ITEM1}} and {{$ITEM2}}? Bonus points for Kevin Bacon reference.";
@@ -14,7 +12,6 @@ const string DEGREES_OF_SEPARATION_PROMPT = "How many degrees of separation are 
 var key = "5b742c40-bc2b-4a4f-902f-ee9f644d8844";
 var endpoint = "https://piloteers-temporary-openai-westus.openai.azure.com/";
 var model = "dv3";
-
 
 var sk = Kernel.Builder.Configure(c => c.AddAzureOpenAICompletionBackend(model, model, endpoint, key)).Build();
 
@@ -38,31 +35,20 @@ sk.CreateSemanticFunction(DEGREES_OF_SEPARATION_PROMPT,
 var thingiliketodo = "read";
 var llmResult = string.Empty;
 var apiResult = string.Empty;
-PythonEngine.Initialize();
-using (Py.GIL())
-{
-    dynamic sys = Py.Import("sys");
-    var pythonpath = Environment.GetEnvironmentVariable("PYTHONPATH");
-    Console.WriteLine("This is:" + pythonpath);
-    sys.path.insert(0, pythonpath);
-    dynamic skill = Py.Import("pythonskills.randomActivitySkill");
-    Console.WriteLine(skill.RandomActivitySkill.getRandomActivity());
 
-    sk.ImportSkill(skill.RandomActivitySkill, "PythonSkill");
-    //ask the skill to find us a random activity via API
-    var skillApiRandomActivityResult = await sk.RunAsync(sk.Skills.GetNativeFunction("PythonSkill", "getRandomActivity"));
-    apiResult = skillApiRandomActivityResult.Result;
-    Console.WriteLine("Skill suggested: " + apiResult);
-}
 //We will compare the activity to the one from the LLM and return true if they match, false if not
-
-
-
+var randomActivitySkill = new PythonRandomActivitySkill();
+sk.ImportSkill(randomActivitySkill, nameof(PythonRandomActivitySkill));
 
 //ask the LLM for a random activity
 var llmRandomActivityResult = await sk.RunAsync(thingiliketodo, sk.Skills.GetSemanticFunction("RandomActivityLLMSkill", "GetRandomActivity"));
 llmResult = llmRandomActivityResult.Result;
 Console.WriteLine("LLM suggested: " + llmResult);
+
+//ask the skill to find us a random activity via API
+var skillApiRandomActivityResult = await sk.RunAsync(sk.Skills.GetNativeFunction(nameof(PythonRandomActivitySkill), "GetRandomActivity"));
+apiResult = skillApiRandomActivityResult.Result;
+Console.WriteLine("Skill suggested: " + apiResult);
 
 //lastly, for fun, find out how many degrees of separation exist between these concepts :)
 var contextVariables = new ContextVariables();
