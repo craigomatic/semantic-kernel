@@ -34,9 +34,10 @@ sk.CreateSemanticFunction(DEGREES_OF_SEPARATION_PROMPT,
             topP: 0.5);
 #endregion
 
-//TODO: load your python skill here
+// TODO: Find a better way to invoke Java skill
 //currently loading a skill that will pull a random activity from an API.
 //We will compare the activity to the one from the LLM and return true if they match, false if not
+// TODO: RandomActivitySkill can be refactored to REST skill
 var randomActivitySkill = new RandomActivitySkill();
 sk.ImportSkill(randomActivitySkill, nameof(RandomActivitySkill));
 
