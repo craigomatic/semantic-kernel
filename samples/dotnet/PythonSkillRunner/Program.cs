@@ -9,9 +9,9 @@ const string RANDOM_ACTIVITY_PROMPT = "Find me an activity to do, return only a 
 const string DEGREES_OF_SEPARATION_PROMPT = "How many degrees of separation are there between {{$ITEM1}} and {{$ITEM2}}? Bonus points for Kevin Bacon reference.";
 
 //configure your Azure OpenAI backend
-var key = "5b742c40-bc2b-4a4f-902f-ee9f644d8844";
-var endpoint = "https://piloteers-temporary-openai-westus.openai.azure.com/";
-var model = "dv3";
+var key = "";
+var endpoint = "";
+var model = "";
 
 var sk = Kernel.Builder.Configure(c => c.AddAzureOpenAICompletionBackend(model, model, endpoint, key)).Build();
 
