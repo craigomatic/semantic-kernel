@@ -66,6 +66,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JavaSkillRunner", "..\sampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotnetReferenceSkill", "..\samples\dotnet\DotnetReferenceSkill\DotnetReferenceSkill.csproj", "{D49FC00D-3102-43B6-8120-093EF2FACA03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcSkillRunner", "..\samples\dotnet\GrpcSkillRunner\GrpcSkillRunner.csproj", "{A2A10C59-4EE4-46C7-8BF7-00317AA1E5AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -148,6 +150,10 @@ Global
 		{D49FC00D-3102-43B6-8120-093EF2FACA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D49FC00D-3102-43B6-8120-093EF2FACA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D49FC00D-3102-43B6-8120-093EF2FACA03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2A10C59-4EE4-46C7-8BF7-00317AA1E5AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2A10C59-4EE4-46C7-8BF7-00317AA1E5AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2A10C59-4EE4-46C7-8BF7-00317AA1E5AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2A10C59-4EE4-46C7-8BF7-00317AA1E5AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,6 +180,7 @@ Global
 		{8FBB03E4-7402-40D3-8A8A-BA1F327F6BF8} = {0E881C20-29A5-454D-97D0-9FEC762BBEFF}
 		{5EB48620-02BE-4143-ABF8-F415D413EFE7} = {0E881C20-29A5-454D-97D0-9FEC762BBEFF}
 		{D49FC00D-3102-43B6-8120-093EF2FACA03} = {0E881C20-29A5-454D-97D0-9FEC762BBEFF}
+		{A2A10C59-4EE4-46C7-8BF7-00317AA1E5AD} = {0E881C20-29A5-454D-97D0-9FEC762BBEFF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FBDC56A3-86AD-4323-AA0F-201E59123B83}
