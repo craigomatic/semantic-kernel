@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using Grpc.Net.Client;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.KernelExtensions;
@@ -17,7 +19,7 @@ var endpoint = "";
 var model = "";
 
 //configure gRPC server address
-const string DEFAULT_GRPC_SERVER_ADDRESS = "localhost:50051";
+const string DEFAULT_GRPC_SERVER_ADDRESS = "http://localhost:50051";
 
 var sk = Kernel.Builder.Configure(c => c.AddAzureOpenAICompletionBackend(model, model, endpoint, key)).Build();
 
@@ -64,7 +66,7 @@ var randomActivityClient = new RandomActivitySkill.RandomActivitySkillClient(cha
 
 // Call gRPC service to get random activity
 var randomActivityResponse = await randomActivityClient.GetRandomActivityAsync(new GetRandomActivityRequest { Input = THING_I_LIKE_TO_DO });
-apiResult = randomActivityResponse.Activity;
+apiResult = JsonSerializer.Deserialize<Dictionary<string, object>>(randomActivityResponse.Activity)["activity"].ToString();
 Console.WriteLine($"Random Activity: {apiResult}");
 
 Console.WriteLine("Press any key to exit...");

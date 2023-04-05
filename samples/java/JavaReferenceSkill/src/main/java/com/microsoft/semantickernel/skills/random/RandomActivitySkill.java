@@ -34,6 +34,7 @@ public class RandomActivitySkill extends RandomActivitySkillGrpc.RandomActivityS
             CompletableFuture<HttpResponse<String>> response = httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
             logger.info("Response: " + response.get().body());
             responseObserver.onNext(ActivityOuterClass.GetRandomActivityResponse.newBuilder().setActivity(response.get().body()).build());
+            responseObserver.onCompleted();
         } catch (Exception e) {
             logger.severe("Error with request: " + e.getMessage());
         }
