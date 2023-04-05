@@ -46,5 +46,6 @@ public class RandomActivitySkillTest {
         randomActivitySkill.getRandomActivity(request, responseObserver);
 
         verify(responseObserver).onNext(any(ActivityOuterClass.GetRandomActivityResponse.class));
+        verify(responseObserver).onCompleted();
     }
 }
