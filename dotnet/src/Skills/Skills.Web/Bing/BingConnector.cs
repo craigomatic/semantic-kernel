@@ -23,28 +23,32 @@ public sealed class BingConnector : IWebSearchEngineConnector
     private readonly ILogger _logger;
     private readonly HttpClient _httpClient;
     private readonly string? _apiKey;
+    private readonly BingSearchFreshness? _searchFreshness;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BingConnector"/> class.
     /// </summary>
     /// <param name="apiKey">The API key to authenticate the connector.</param>
+    /// <param name="searchFreshness">The freshness of the search results.</param>
     /// <param name="logger">An optional logger to log connector-related information.</param>
-    public BingConnector(string apiKey, ILogger<BingConnector>? logger = null) :
-        this(apiKey, new HttpClient(NonDisposableHttpClientHandler.Instance, false), logger)
+    public BingConnector(string apiKey, BingSearchFreshness? searchFreshness = null, ILogger<BingConnector>? logger = null) :
+        this(apiKey, new HttpClient(NonDisposableHttpClientHandler.Instance, false), searchFreshness, logger)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BingConnector"/> class.
     /// </summary>
-    /// <param name="apiKey">The API key to authenticate the connector.</param>
+    /// <param name="apiKey">The API key to authenticate the connector.</param>    
     /// <param name="httpClient">The HTTP client to use for making requests.</param>
+    /// <param name="searchFreshness">The freshness of the search results.</param>
     /// <param name="logger">An optional logger to log connector-related information.</param>
-    public BingConnector(string apiKey, HttpClient httpClient, ILogger<BingConnector>? logger = null)
+    public BingConnector(string apiKey, HttpClient httpClient, BingSearchFreshness? searchFreshness = null, ILogger<BingConnector>? logger = null)
     {
         Verify.NotNull(httpClient);
 
         this._apiKey = apiKey;
+        this._searchFreshness = searchFreshness;
         this._logger = logger ?? NullLogger<BingConnector>.Instance;
         this._httpClient = httpClient;
         this._httpClient.DefaultRequestHeaders.Add("User-Agent", Telemetry.HttpUserAgent);
@@ -59,7 +63,11 @@ public sealed class BingConnector : IWebSearchEngineConnector
 
         if (offset < 0) { throw new ArgumentOutOfRangeException(nameof(offset)); }
 
-        Uri uri = new($"https://api.bing.microsoft.com/v7.0/search?q={Uri.EscapeDataString(query)}&count={count}&offset={offset}");
+        var freshnessString = this._searchFreshness == null || this._searchFreshness.Type == BingSearchFreshnessType.Default ?
+            string.Empty :
+            $"&{this._searchFreshness}";
+
+        Uri uri = new($"https://api.bing.microsoft.com/v7.0/search?q={Uri.EscapeDataString(query)}&count={count}&offset={offset}{freshnessString}");
 
         this._logger.LogDebug("Sending request: {0}", uri);
 
