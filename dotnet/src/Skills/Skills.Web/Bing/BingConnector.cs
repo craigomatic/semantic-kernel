@@ -39,7 +39,7 @@ public sealed class BingConnector : IWebSearchEngineConnector
     /// <summary>
     /// Initializes a new instance of the <see cref="BingConnector"/> class.
     /// </summary>
-    /// <param name="apiKey">The API key to authenticate the connector.</param>    
+    /// <param name="apiKey">The API key to authenticate the connector.</param>
     /// <param name="httpClient">The HTTP client to use for making requests.</param>
     /// <param name="searchFreshness">The freshness of the search results.</param>
     /// <param name="logger">An optional logger to log connector-related information.</param>
